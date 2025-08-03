@@ -7,7 +7,6 @@
 #Notes: Simple Bash script to list users with **read (pull)** access to a specific GitHub repository using the GitHub REST API.
 ####################
 
-
 # GitHub API URL
 API_URL="https://api.github.com"
 
@@ -33,14 +32,21 @@ function list_users_with_read_access {
     local endpoint="repos/${REPO_OWNER}/${REPO_NAME}/collaborators"
 
     # Fetch the list of collaborators on the repository
-    collaborators="$(github_api_get "$endpoint" | jq -r '.[] | select(.permissions.pull == true) | .login')"
+    response="$(github_api_get "$endpoint")"
 
-    # Display the list of collaborators with read access
-    if [[ -z "$collaborators" ]]; then
-        echo "No users with read access found for ${REPO_OWNER}/${REPO_NAME}."
+    # Check if the response is a valid array to avoid jq error
+    if echo "$response" | jq -e 'type == "array"' > /dev/null 2>&1; then
+        collaborators="$(echo "$response" | jq -r '.[] | select(.permissions.pull == true) | .login')"
+
+        # Display the list of collaborators with read access
+        if [[ -z "$collaborators" ]]; then
+            echo "No users with read access found for ${REPO_OWNER}/${REPO_NAME}."
+        else
+            echo "Users with read access to ${REPO_OWNER}/${REPO_NAME}:"
+            echo "$collaborators"
+        fi
     else
-        echo "Users with read access to ${REPO_OWNER}/${REPO_NAME}:"
-        echo "$collaborators"
+        echo "GitHub API Error: $(echo "$response" | jq -r '.message // "Unknown error"')"
     fi
 }
 
