@@ -19,14 +19,6 @@ TOKEN="$token"
 REPO_OWNER=$1
 REPO_NAME=$2
 
-function helper {
-    num_of_parameter=2
-    if [[ $# -ne 2 ]]; then
-        echo "Error: You must provide exactly 2 arguments: <repo_owner> <repo_name>"
-        exit 1
-    fi    
-}
-
 # Function to make a GET request to the GitHub API 
 function github_api_get {
     local endpoint="$1"
