@@ -23,6 +23,7 @@ function helper {
     num_of_parameter=2
     if [[ $# -ne 2 ]]; then
         echo "Error: You must provide exactly 2 arguments: <repo_owner> <repo_name>"
+        exit 1
     fi    
 }
 
